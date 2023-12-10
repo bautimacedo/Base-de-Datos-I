@@ -1,0 +1,470 @@
+Clases anteriores
+#Se crea la tabla personas
+CREATE TABLE `practico`.`personas` (
+  `idpersonas` INT NOT NULL AUTO_INCREMENT,
+  `nacimiento` DATE NULL,
+  `nombre` VARCHAR(45) NULL,
+  PRIMARY KEY (`idpersonas`));
+  
+  #Instruccion insert inserta una sola persona
+  INSERT INTO personas(nombre, nacimiento) VALUES ('Lionel','1987-6-24');
+  #INSERTAR DOS PERSONAS
+INSERT INTO personas(nombre, nacimiento) VALUES ('Sebastian','2010-6-24'),('Camila','2014-4-29');
+#Borar tablas con condicion de borrado
+DELETE FROM personas WHERE id=1;
+
+UPDATE personas SET nacimiento='1990-01-20' WHERE nombre='Leonel';
+
+
+/*
+Comparadores de sql
+= igual
+< menor
+<= menor igual
+> mayor
+>= mayor igual
+
+Operadores logicos
+and
+or
+not
+xor
+*/
+
+17/05
+En el comando select se utiliza
+select [cantidad de columnas] from
+Select 1+1 
+select [c1,c2,...,cn] from //En el caso de poner un asterisco selecciona todas
+Luego del from va el nombre de la tabla
+Ejemplo:select idCliente from clientes
+select producto, precio from productos;
+select producto,precio,precio*0.9 from productos;
+el where es opcional y tiene como valor por defecto "true"
+lo que esta entre el select y el from me define la cantidad de columnas, y lo que esta en el where me define las filas, se utiliza para filtrar
+Ejemplo: select * from productos where precio>200;
+	  select * from productos where precio>200 and precio<300
+	  select * from productos where precio>200 and idRubro=5 and precio<300;
+Aparte de and podemos utilizar or xor y not
+Operador "between and" se utiliza par el rango en el cual estamos trabajando siempre es obligatorio utilizar el and.
+select * from productos where precio between 200 and 300;
+
+select * from zonas,rubros; // En este caso se multiplican las tablas.
+Esto a veces es correcto y aveces no.
+Ejemplo de cuando no es correcto:
+select * from clientes,zonas; //Estoy queriendo ver 100 filas (cantidad de clientes) pero estoy viendo 1000.
+Entonces cuando hacemos eso necesitamos una condicion de union.
+select * from clientes,zonas where idzona=idzona;
+Se sigue sin encontrar la solucion ya que esto es ambiguo.
+select * from clientes,zonas where clientes.idzona=zonas.idzona;
+Si tengo dos tablas en el from las tengo que unir
+A las expreciones se les puede poner alias,
+select * from clientes as c,zonas z where...;
+La palabra as no es obligatoria y una vez utilizado el alias no se puede utilizar el nombre original.
+select idCliente codigo, clientes , zonas
+ from clientes as c, zonas zonas
+ where c.idzona=z.idzona;
+
+Ejercicio:
+
+#Listado de productos de rubros 1 y 2 se desea ver: producto, rubro, provedor, precio
+Tengo 3 tablas necesito 2 condiciones de union
+Ademas agrego la condicion que me pide el problema
+
+select Producto, messi.idProveedor, precio , Proveedor
+from productos p,rubros r, proveedores messi 
+where (r.idRubro = 1 or r.idRubro=2) and r.idRubro=p.idRubro 
+and (messi.idProveedor= messi.idProveedor);
+
+El orden no importa, pero igual si quiero ordenar puedo ordenar tranquilamente
+Es fundamental tener orden en el resultado.
+Como ordeno en las sentencias sql?? Con la funcion order by
+
+Ejemplo:
+select idRubro,producto,precio from productos order by Producto;
+
+En este caso se ordeno de forma alfabetica
+Se puede tener un doble ordenamiento.
+select idRubro,Producto,precio from productos order by idRubro, Producto;
+
+En el caso de quererlo de forma decendente se utiliza de la forma asc o desc
+asc: acendente.
+desc: decendente.
+
+Ejemplo:
+
+#Lista del mas caro al mas barato
+select idRubro,Producto,precio from productos order by idRubro asc, precio desc;
+
+La sentencia limit se utiliza para limitar la cantidad de filas que desees mostrar, esto tiene sentido con el order by.
+
+#Los tres productos mas caros.
+select * from productos order by precio desc limit 3;
+
+Tambien se podria hacer un desde y cuantos
+
+Ejemplo:
+
+#Desde el 3ro mas caro cuenta 3.
+select * from productos order by precio desc limit 2,3;
+
+
+Para trabajar con las cadenas de caracteres se puede utilizar el comando "Like" el cual qure decir parecido, pero tambien tiene comodines % en este caso remplazar 1 o todo.
+Ejemplo
+#Comienza con:
+select * from productos where Producto like 'Producto 1%';
+#Termina con:
+select * from productos where Producto like '%1';
+#Contiene:
+select * from productos where Producto like 'Producto %1%';
+#Para limitar la cantidad de guiones ___-
+select * from productos where Producto like '__o%';
+#Al menos n cantidad de caracteres.
+select * from productos where Producto like '%____%';
+
+Para buscar un % se utiliza la \
+select * from productos where Producto like '%\%%';
+
+CLASE 22/5
+
+
+EL LIKE SIRVE PARA TRABAJAR CON CADENAS NOMAs
+
+lo correcto en el 5 para trabajra con fechas es el between
+
+fotos del profe de los ejercicios resuletos
+
+1. ----------------------------------------------------------------------------------------
+SELECT cliente,zona FROM clientes c, zonas z
+WHERE c.idZona=z.idZona AND c.cuentaHabilitada=0 ORDER BY zona,cliente
+notar que la clave foranea esta en cliente y la principal en zona (idZona)
+
+en los predicados puedo identificar internos y externos. iNTERNO ES CUANDO los operandos pertenecen a la misma tabla o  tengo una constante 
+ej :     edad = 30; (el 30 no es una columna, por eso es interno, solo tiene contenido de una tabla)
+
+ej 2:    c.idZona=z.idZona --> predicado externo. (se relacionan dos tablas)
+
+cuando se quiere mejorar rapidez de el programa primero se ven los predicadso externos (son los mas criticos debido a que son los que llevan mayor tiempo de proceso)
+
+
+2. ---------------------------------------------------------------------------------------
+select zona from zonas where zona like '/%9%' order by zona desc;  
+
+
+3. ______________________________________________________________________________________________
+select cliente,zona from clientes c , zonas z where c.idzona = z.idzona and cliente like '%7'; 
+
+
+4. ___________________________________________________________________________________________________
+select producto from productos where producto like '%3';
+
+5. ________________________________________________________________________________________
+
+cuatros tablas, tres condiciones de union
+clave foranea = clave principal mecanico
+select numero as 'Nª de factura', fecha,cliente,zona,vendedor 
+from facturacabecera fc, clientes c ,zonas z ,vendedores v
+where fc.idVendedor = v.idVendedor and fc.idCliente = c.idCliente and c.idZona = z.idZona and
+fc.anulada = 1 and
+fc.fecha >= '2007-01-01' and fc.fecha <= '2007-12-31'
+order by fc.fecha
+no hace falta poner fc porq hay solo una tabla fecha en la bd
+167 - cuatro tablas llamadas
+168 - condiciones de unio
+
+
+USANDO OPERADOR BETWEEN:
+
+select numero as 'Nª de factura', fecha,cliente,zona,vendedor 
+from facturacabecera fc, clientes c ,zonas z ,vendedores v
+where fc.idVendedor = v.idVendedor and fc.idCliente = c.idCliente and c.idZona = z.idZona and
+fc.anulada = 1 and
+fc.fecha between'2007-01-01' and '2007-12-31'
+order by fc.fecha
+
+
+hay funciones para trabajar con tiempo que extraen partes. reciben como parametro un tipo tiempo 
+tiempo --> date, date time
+year(tiempo) retorna entero
+
+ej : year('2007-01-01') devuelve 2007
+
+month --> devuelve del 1 al 12
+
+day --> devuelve 1 al.. 
+
+
+hour --> devuelve la hora 0 a 23 valor
+minute
+second 
+millisecond
+
+usando funciones.....
+
+select numero as 'Nª de factura', fecha,cliente,zona,vendedor 
+from facturacabecera fc, clientes c ,zonas z ,vendedores v
+where fc.idVendedor = v.idVendedor and fc.idCliente = c.idCliente and c.idZona = z.idZona and
+fc.anulada = 1 and
+year(fc.fecha) = 2007 
+order by fc.fecha
+
+
+6. _____________________________________________________________________________________
+select vendedor , comision from vendedores order by comision desc limit 4;
+
+
+
+ejercicio del profe 
+CONSULTA ADENTRO DE OTRA CONSULTA (subconsulta-subquery)
+select cliente,zona from 
+clientes c,
+(SELECT * FROM zonas) z 
+where c.idzona = z.idzona and cliente like '%7'; 
+
+
+alfabeticamente los 4 con mejor comision
+select * from (select vendedor , comision from vendedores order by comision desc limit 4) z
+order by vendedor ; 
+ 
+----------------------------------------------------------------------------------------------
+
+ejercicio:los 10 productos mas baratos ordenados por rubro y producto, quiero ver nombre,precio,rubro,proveedor (del producto)
+
+select * from 
+(select producto ,rubro , proveedor, precio from productos p, rubros r, proveedores pr 
+where p.idRubro=r.idRubro and p.idProveedor=pr.idProveedor
+order by precio asc limit 10) s
+order by rubro, producto
+
+SELECT atributos from tabla where condiciones de union (PK,FK) order by condicion de orden
+
+--------------------------------------------------------------------------------------
+
+select * from productos where idRubro=1 or idRubro=3 or idRubro=5
+
+operador "in" 
+columna in (valores)
+columna in (1,6,8,12)
+Ventaja --> me ahorro los or y problemas de parentesis y preioridades, ademàs puedp poner sentencias sql que me devuelvan un solo valor
+
+select * from productos where idrubro in(1,3,5);
+
+-------------------------------------------------------------------------------------------
+select idvendedor from facturacabecera where day(fecha) 
+between 1 and 7 and month(fecha) = 12 and year(fecha) = 2007
+order by idVendedor
+
+
+operador DISTINCT para que no se repitan los vendedores
+
+select DISTINCT idvendedor from facturacabecera where day(fecha) 
+between 1 and 7 and month(fecha) = 12 and year(fecha) = 2007
+order by idVendedor
+
+
+quiero ver los vendedores que no vendieron en esa primer semana
+
+Operador not in negacion del in (definicion clara del bauti) 
+
+select * from vendedores where idvendedor not in(select DISTINCT idvendedor from facturacabecera where day(fecha) between 1 and 7 and month(fecha) = 12 and year(fecha) = 2007) 
+order by idVendedor
+
+
+------------------------------------------------------------------------------------------------
+
+
+
+locales y externos mejor escritos
+
+inner join tablas on condicion de union -->  sustituye las comas del from (segun magm3333[hombre pinguino] reemplaza el igual)
+
+select cliente,zona from clientes c inner join zonas z on c.idzona  = z.idzona
+
+
+-------------------------------------------------------------------------------------------------------------
+
+temita potente segun pinguino (Wolf Edition)
+
+funciones de agregacion (lo vemos la sema que viene)
+
+sum 
+min
+max
+avg -> promedio
+count --> full potente
+stdv -> standar deviation
+
+promedio de precio de productos
+
+SELECT AVG(precio)prom from productos
+prom es el alias (no es necesario, aclaracion de la loba en celo)
+
+SELECT AVG(precio)prom,Min(PRECIO), max(precio), count(precio)cantidad from productos where idrubro = 6
+
+
+promedio de precio de productos del rubor 16
+ 
+
+----------------------------------CLASE 24/05---------------------------------------------
+
+ej12 . Primero busco los proveedores que proveyeron y despues busco un not in
+
+Select Distinct idProveedor FROM productos //los que proveyeron
+
+
+Select proveedor from proveedores where idProveedor NOT IN (Select Distinct idProveedor FROM productos)
+
+Criterios de Agrupacion
+
+Dividir tabla de personas por genero (2 tablas)
+Dividir tabla de personas por genero y por mes de nacimiento (2*12 tablas)
+
+Mientras mas criterios, mas tablas con menos datos cada una
+Mientras menos criterios, menos tablas con mas datos cada una
+
+
+--------------------------------EJEMPLO----------------------------------------------------
+
+SELECT idRubro FROM productos GROUP BY IdRubro
+
+la palabra group by va despues del WHERE
+
+ahora queremos ver cuantos productos hay por rubro y su promedio por rubro
+
+SELECT idRubro,count(*),AVG(precio) as Contador FROM productos GROUP BY IdRubro
+
+----------------------------------------------------------
+
+la siguiente setencia no tiene sentido porque el group by te larga un valor por columna, es decir:
+idRubro= 1 - Contador= 59 - Prom= 230 - Producto= ?, No te puede expresar 59 nombres de producto como un solo valor.
+
+
+SELECT idRubro,count(*),AVG(precio),producto as Contador FROM productos GROUP BY IdRubro
+
+
+El group by solo se puede suar con funciones de agregacion o constantes
+······················································· Precio Prom y cant por rubro
+SELECT p.idRubro, rubro, count(*),AVG(precio)
+FROM productos p INNER JOIN rubros r ON p.idRubro=r.idRubro
+GORUP BY p.idrubro, rubro;
+
+SELECT idCliente,SUM(cantidad) cantidad
+FROM facturacabecera fn INNER JOIN facturadetalle fd
+ON fn.idfactura=fd.idfactura
+WHERE anulada=0
+GROUP BY idCliente
+
+si quiero hacer para los que les vendi mas de 15000 unidades
+SELECT idCliente,SUM(cantidad) cantidad
+FROM facturacabecera fn INNER JOIN facturadetalle fd
+ON fn.idfactura=fd.idfactura INNER JOIN clientes c ON fn.idCliente=c.idCliente
+WHERE anulada=0
+GROUP BY idCliente
+HAVING SUM(cantidad)>15000
+
+notar que el having va despues del group by 
+
+
+importe efectivo vendido por año y zona
+
+SELECT ROUND(SUM(fd.cantidad * p.precio),2) AS total, z.zona, YEAR(fc.fecha) AS Anio, COUNT(*) AS Contador
+FROM zonas z
+INNER JOIN clientes c ON z.idZona = c.idZona
+INNER JOIN facturacabecera fc ON c.idCliente = fc.idCliente
+INNER JOIN facturadetalle fd ON fc.idFactura = fd.idFactura
+INNER JOIN productos p ON fd.idProducto = p.idProducto
+WHERE anulada = 0
+GROUP BY z.zona, YEAR(fc.fecha)
+order by YEAR(fc.fecha) asc
+
+
+
+
+
+13.	Cantidad de Productos por Rubro y precio promedio, ordenados alfabéticamente [Rubro, Cantidad de Productos, Precio Promedio]
+SELECT SUM(cantidad) AS Cantidad , rubro, AVG(precio) as Promedio
+FROM productos p INNER JOIN rubros r ON p.idrubro=r.idrubro 
+INNER JOIN facturadetalle fd ON p.idproducto=fd.idproducto
+GROUP BY rubro
+
+
+14.	Todas las Facturas emitidas en el 1er Trimestre año 2006, ordenadas alfabéticamente [Nº de Factura, Fecha, Cliente, Vendedor, Total]
+ SELECT fc.idfactura as NªFactura, cliente, vendedor, fecha, cantidad as total
+FROM 
+clientes c INNER JOIN facturacabecera fc ON c.idcliente=fc.idcliente
+INNER JOIN facturadetalle fd ON fc.idfactura=fd.idfactura
+INNER JOIN vendedores v ON v.idvendedor=fc.idvendedor
+WHERE year(FECHA)=2008
+AND month(fecha) IN (1,2,3,4)
+order by numero asc
+
+15.	Detalle de la Factura 12, ordenada por Producto [Nº de Factura, Fecha, Cliente, Vendedor, Rubro, Proveedor, Producto, Cantidad, Precio, Subtotal]
+
+SELECT fc.idfactura as NªFactura, cliente, vendedor, fecha,
+cantidad as total, rubro, proveedor, producto, precio
+FROM 
+clientes c INNER JOIN facturacabecera fc ON c.idcliente=fc.idcliente
+INNER JOIN facturadetalle fd ON fc.idfactura=fd.idfactura
+INNER JOIN vendedores v ON v.idvendedor=fc.idvendedor
+INNER JOIN productos p on fd.idproducto=p.idproducto
+INNER JOIN proveedores pr on p.idproveedor=pr.idproveedor
+INNER JOIN rubros r on p.idrubro=r.idrubro
+WHERE fc.idfactura=12
+order by producto asc
+
+16.Importe Total facturado por Cliente hasta el 06/03/2014, ordenado por importe descendente [Cliente, Importe facturado]
+
+SELECT cliente, SUM(cantidad) as total FROM
+clientes c INNER JOIN facturacabecera fc ON c.idcliente=fc.idcliente
+INNER JOIN facturadetalle fd ON fc.idfactura=fd.idfactura
+WHERE year(FECHA)<=2014 AND month(FECHA)<=06 AND day(FECHA)<=03
+group by CLIENTE
+order by cliente asc
+
+17.Los 3 productos más vendidos ordenados alfabéticamente [Rubro, Proveedor, Producto, Cantidad Vendida, Precio, Total]
+ESTA MAL HECHO
+SELECT cantidad as CantidadVendida, rubro, proveedor, producto, precio
+FROM 
+facturadetalle fd
+INNER JOIN productos p on fd.idproducto=p.idproducto
+INNER JOIN proveedores pr on p.idproveedor=pr.idproveedor
+INNER JOIN rubros r on p.idrubro=r.idrubro
+order by cantidad, producto desc 
+
+18.	Lista de los productos cuyo precio supere el 90% del producto mas caro, ordenado descendente por precio. [Producto, Precio]
+SELECT producto, precio 
+FROM productos p
+WHERE precio> (SELECT MAX(precio)*0.9 from productos) 
+order by precio desc
+
+
+19.	Nombre del Vendedor que más a vendido [Vendedor, Importe vendido]
+NO LO HICE BIEN
+SELECT vendedor, sum(cantidad))
+FROM vendedores v 
+INNER JOIN facturacabecera fc
+ON v.idvendedor=fc.idvendedor 
+INNER JOIN facturadetalle fd
+ON fc.idfactura=fd.idfactura
+WHERE fd.MAX(cantidad)=cantidad
+group by vendedor
+
+
+
+
+28. SELECT rubro, proveedor, producto , precio
+FROM productos p INNER JOIN rubros r on p.idrubro=r.idrubro
+INNER JOIN proveedores pr ON pr.idproveedor=p.idproveedor
+inner join facturadetalle fd ON fd.idproducto=p.idproducto
+INNER JOIN facturacabecera fc ON fd.idfactura=fc.idfactura
+INNER JOIN clientes c ON fc.idcliente=c.idcliente 
+INNER JOIN zonas z ON z.idzona=c.idzona
+WHERE fd.cantidad=0 and z.idzona=4
+
+
+27. SELECT Round(SUM(precio*cantidad)) as Importe, year(fecha) as Fecha
+FROM productos p INNER JOIN facturadetalle fd ON p.idproducto=fd.idproducto
+INNER JOIN facturacabecera fc ON fc.idfactura=fd.idfactura
+WHERE anulada=0 
+GROUP BY year(fecha)
+order by year(fecha) desc
